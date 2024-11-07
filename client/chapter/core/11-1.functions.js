@@ -82,11 +82,12 @@ console.assert(rem('25px') === '1.5625rem');
 console.assert(rem('30px', 10) === '3rem');
 
 // css(node: string, prop: string, value: number|strung) : string;
-let css;
 
 // 객체는 연산 표기법 2가지  [ .연산 , [대괄호] ]
 
 const first = document.querySelector('.first');
+
+// 왜? 왜해야 하는지 궁금해야 개발자적 사고가 됨
 
 function setCss(node, prop, value) {
   if (typeof node === 'string') node = document.querySelector(node);
@@ -103,6 +104,45 @@ function setCss(node, prop, value) {
 }
 
 setCss('.first', 'color', 'orange');
+
+// 겟터 : $0.style.color;
+// 셋터 : $0.style.color = 'red';
+
+function getCss(node, prop) {
+  if (typeof node === 'string') {
+    node = document.querySelector(node);
+  }
+
+  if (!(prop in document.body.style)) {
+    throw new ReferenceError(
+      'getCss 함수의 두 번째 인수는 유효한 css 속성 이어야 합니다.'
+    );
+  }
+
+  return getComputedStyle(node)[prop];
+}
+
+const fontSize = getCss('.first', 'border');
+
+console.log(fontSize);
+
+function css(node, prop, value) {
+  // if (!value) {
+  //   return getCss(node, prop); //getter
+  // } else {
+  //   setCss(node, prop, value); // setter
+  // }
+
+  // 위 문구를 삼항식으로 작성
+  return !value ? getCss(node, prop) : setCss(node, prop, value);
+}
+// 화살표 함수로 작성
+const _css = (node, prop, value) =>
+  !value ? getCss(node, prop) : setCss(node, prop, value);
+
+console.log(css('.first', 'color')); // getter
+
+css('.first', 'color', 'red'); //setter
 
 /* 
 1. function name
