@@ -1,19 +1,19 @@
 {
   "name": "core_js",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "index.js",
   "scripts": {
     "dev": "live-server client --host=localhost --port=5500 --no-browser"
   },
   "keywords": [],
-  "author": "lyb9030",
-  "license": "ISC",
+  "author": "kindtiger",
+  "license": "MIT",
   "description": "",
   "devDependencies": {
     "@eslint/js": "^9.13.0",
     "eslint": "^9.13.0",
     "globals": "^15.11.0",
-    "live-serve": "^0.0.0",
-    "prettier": "^3.3.3"
+    "live-server": "1.2.2",
+    "prettier": "3.3.3"
   }
 }

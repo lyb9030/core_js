@@ -1,13 +1,31 @@
-// 변수 만들기
-const a = "hello";
+// named export           =>  import { } from '..'
+// default export         =>  import ... from '..'
 
-// 만든 변수를 담아서 나오게 함
+// import { getNode as $, getNodes } from './lib/dom/getNode.js';
+// import { insertLast } from './lib/dom/insert.js';
 
-function sum() {}
+// import clearContents from "./lib/dom/clearContents.js";
 
-//경고창 팜업 (마우스 우클릭 사용 불가)
-alert("경고창!!!");
+import { getNode as $, getNodes, typeError, insertLast, clearContents } from './lib/index.js';
 
-confirm("정말..지울꺼야...?");
+// 1. input 선택하기
+// 2. input 이벤트 바인딩
+// 3. input의 value 값 가져오기
+// 4. 숫자 더하기
+// 5. result에 출력하기
 
-prompt("당신은 잘생겼습니까?");
+const first = $('#firstNumber');
+const second = $('#secondNumber');
+const result = $('.result');
+
+function handleInput() {
+  const firstValue = Number(first.value);
+  const secondValue = +second.value;
+  const total = firstValue + secondValue;
+
+  clearContents(result);
+  insertLast(result, total);
+}
+
+first.addEventListener('input', handleInput);
+second.addEventListener('input', handleInput);
