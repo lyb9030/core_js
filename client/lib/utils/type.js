@@ -9,3 +9,4 @@ export const isBigInt = (data) => typeOf(data) === 'bigint';
 export const isFunction = (data) => typeOf(data) === 'function';
 export const isMath = (data) => typeOf(data) === 'math';
 export const isUndefined = (data) => typeOf(data) === 'undefined';
+export const isNumericString = (data) => isNaN(Number(data));
