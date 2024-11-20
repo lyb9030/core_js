@@ -1,113 +1,108 @@
-import data from './data/data.js';
 import {
-  shake,
-  copy,
-  addClass,
-  showAlert,
-  getRandom,
+  memo,
+  attr,
+  getNode,
+  getNodes,
+  endScroll,
   insertLast,
-  removeClass,
-  getNode as $,
   clearContents,
-  isNumericString,
+  diceAnimation,
 } from './lib/index.js';
 
-// [phase-1]
+const [rollingButton, recordButton, resetButton] = getNodes('.buttonGroup > button');
+const recordListWrapper = getNode('.recordListWrapper');
 
-// 1. 주접 떨기 버튼 클릭 하는 함수
-//    - 주접 떨기 버튼 가져오기
-//    - 이벤트 연결
+// [주사위 굴리기 버튼을 누르면 주사위가 선택되기]
+// 1. 주사위 굴리기 버튼을 선택하기
+// 2. 클릭 이벤트 바인딩
 
-// 2. input 값 가져오기
-//    - 콘솔이 출력
+// [주사위가 애니메이션이 될 수 있도록 만들어 주세요]
+// 1. setInterval
+// 2. diceAnimation()
 
-// 3. data 함수에서 주접 1개 꺼내기
-//    - n번째, random 주접을 꺼내기
-//    - Math.random()
+// [같은 버튼 눌렀을 때 ]
+// 1. 상태 변수 true | false
+// 2. 조건 처리
 
-// 4. result에 랜더링하기
-//    - insertLast()
+// [애니메이션이 재생 or 정지]
+// 1. setInterval
+// 2. clearInterval ( scope )
 
-// [phase-2]
-// 5. 예외 처리
-//    - 이름이 없을 경우 콘솔에 에러 출력 > result에 결과값이 나오면 안됨
-//    - 숫자만 들어오면 콘솔에 에러 출력
+// [기록 버튼을 누르면]
+// 1. recordButton에 클릭 이벤트 바인딩
 
-const submit = $('#submit');
-const nameField = $('#nameField');
-const result = $('.result');
+// [table이 등장]
+// 1. recordListWrapper에 hidden 속성 제어하기 (true | false)
 
-// function handleSubmit(e) {
-//   e.preventDefault(); // 기본 동작은 차단
+// [table 안쪽에 tr 태그 랜더링]
+// 1. 태그 만들기
+// 2. insertLast 함수 사용하기 (tbody 안쪽에 랜더링)
 
-//   const name = nameField.value;
-//   const list = data(name); // data의 리스트를 가져오기
-//   const pick = list[getRandom(list.length)];
-//   // 랜덤한 값을 돌출 (* 10을 해줘서 정수값이 나오게 하고 floor을 해서 버림으로 정리)
+// [table 안쪽에 tr 태그에 데이터를 넣고 랜더링]
 
-//   // 만약에 name 값이 '' 라면...
-//   if (!name || name.replacAll(' ', '') === '') {
-//     console.log('??');
+// [Item의 갯수가 많아짐에 따라 스크롤을 제일 하단으로 올 수 있도록]
+// 1. scrollTop
+// 2. scrollHeight
 
-//     // console.error('제대로된 이름을 입력해 주세요.') // 콘솔창에 에러 메세지 생성
+// [reset버튼을 눌렀을 때 모든 항목 초기화]
+// hidden
+// 변수 초기화
 
-//     addClass('.alert-error', 'is-active'); // 에러 메세지 노출
+let count = 0;
+let total = 0;
 
-//     $('.alert-error').textContent = '제대로된 이름을 입력해 주세요'; // 에러메시지 노출되는 문구 변경
-
-//     setTimeout(() => {
-//       removeClass('.alert-error', 'is-active'); // 에러 메세지 제거
-//     }, 1000);
-//     // 1초 후에 에러메세지 삭제
-
-//     return;
-//   }
-
-//   clearContents(result); // 기존의 문구를 삭제해주는 코드
-//   insertLast(result, pick);
-// }
-
-// showalert 사용 코드
-
-function handleSubmit(e) {
-  e.preventDefault(); // 기본 동작은 차단
-
-  const name = nameField.value;
-  const list = data(name); // data의 리스트를 가져오기
-  const pick = list[getRandom(list.length)];
-  // 랜덤한 값을 돌출 (* 10을 해줘서 정수값이 나오게 하고 floor을 해서 버림으로 정리)
-
-  // 만약에 name 값이 '' 라면...
-  if (!name || name.replaceAll(' ', '') === '') {
-    // console.error('제대로된 이름을 입력해 주세요.') // 콘솔창에 에러 메세지 생성
-
-    showAlert('.alert-error', '공백은 허용하지 않습니다.', 1200);
-    shake(nameField);
-    return;
-  }
-
-  if (!isNumericString(name)) {
-    showAlert('.alert-error', '정확한 이름을 입력해 주세요', 1200);
-    shake(nameField);
-    return;
-  }
-
-  // if(...)
-
-  console.log(isNaN(Number(name))); // 숫자형 문자인지 아닌지 확인이 가능9984
-
-  clearContents(result); // 기존의 문구를 삭제해주는 코드
-  insertLast(result, pick);
+function createItem(value) {
+  const template = `
+    <tr>
+      <td>${++count}</td>
+      <td>${value}</td>
+      <td>${(total += value)}</td>
+    </tr>
+  `;
+  return template;
 }
 
-// 클립보드 복사 방법
-function handleCopy() {
-  const text = this.textContent;
+function renderRecordItem() {
+  // const diceNumber = +attr(getNode('#cube'),'dice')
+  const diceNumber = +memo('cube').getAttribute('dice');
 
-  copy(text).then(() => {
-    showAlert('.alert-success', '클립보드 복사 완료!'); // 클립보드 복사 문구 노출
-  });
+  insertLast('tbody', createItem(diceNumber));
 }
 
-submit.addEventListener('click', handleSubmit);
-result.addEventListener('click', handleCopy);
+// 주사위가 굴러가는 코드
+const handleRollingDice = (() => {
+  let isClicked = false;
+  let stopAnimation;
+
+  return () => {
+    if (!isClicked) {
+      stopAnimation = setInterval(diceAnimation, 100); // // 주사위 굴리기를 눌렀을때 다이스가 1초마다 움직이는 애니메이션 작동
+      recordButton.disabled = true;
+      resetButton.disabled = true;
+    } else {
+      clearInterval(stopAnimation);
+      recordButton.disabled = false;
+      resetButton.disabled = false;
+    }
+
+    isClicked = !isClicked;
+  };
+})();
+
+// 기록 버튼 작동
+function handleRecord() {
+  recordListWrapper.hidden = false; // 기록을 눌렀을때 레코드 리스트가 나오게 하는 것
+  renderRecordItem();
+  endScroll(recordListWrapper); // 스크롤바 맨 밑으로 내리기
+}
+
+function handleReset() {
+  recordListWrapper.hidden = true; // 초기화 누르면 기록 창 안보이기
+  clearContents('tbody'); // 기록 없애기
+  count = 0;
+  total = 0;
+}
+
+rollingButton.addEventListener('click', handleRollingDice);
+recordButton.addEventListener('click', handleRecord);
+resetButton.addEventListener('click', handleReset);
