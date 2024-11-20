@@ -6,12 +6,12 @@ import { isString } from '../utils/type.js';
 
 export function showAlert(node, message = '오류가 발생했습니다.', timeout = 1000) {
   if (isString(node)) node = $(node);
-  node.textContent = message; // 에러메시지 노출되는 문구 변경
 
-  addClass(node, 'is-active'); // 에러 메세지 노출
+  node.textContent = message;
+
+  addClass(node, 'is-active');
 
   setTimeout(() => {
-    removeClass(node, 'is-active'); // 에러 메세지 제거
+    removeClass(node, 'is-active');
   }, timeout);
-  // 1초 후에 에러메세지 삭제
 }
