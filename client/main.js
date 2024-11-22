@@ -1,108 +1,77 @@
 import {
-  memo,
-  attr,
+  tiger,
+  delayP,
   getNode,
-  getNodes,
-  endScroll,
   insertLast,
-  clearContents,
-  diceAnimation,
+  changeColor,
+  renderSpinner,
+  renderUserCard,
+  renderEmptyCard,
 } from './lib/index.js';
 
-const [rollingButton, recordButton, resetButton] = getNodes('.buttonGroup > button');
-const recordListWrapper = getNode('.recordListWrapper');
+const END_POINT = 'https://jsonplaceholder.typicode.com/users';
+const userCardInner = getNode('.user-card-inner');
+renderSpinner(userCardInner);
 
-// [주사위 굴리기 버튼을 누르면 주사위가 선택되기]
-// 1. 주사위 굴리기 버튼을 선택하기
-// 2. 클릭 이벤트 바인딩
+async function renderUserList() {
+  try {
+    const response = await tiger.get(END_POINT);
 
-// [주사위가 애니메이션이 될 수 있도록 만들어 주세요]
-// 1. setInterval
-// 2. diceAnimation()
+    // getNode('.loadingSpinner').remove()
 
-// [같은 버튼 눌렀을 때 ]
-// 1. 상태 변수 true | false
-// 2. 조건 처리
+    // 로딩 창 만들어주는 코드
+    gsap.to('.loadingSpinner', {
+      opacity: 0,
+      // gsap 제공하는 코드 종료하는 법
+      onComplete() {
+        this._targets[0].remove();
+      },
+    });
 
-// [애니메이션이 재생 or 정지]
-// 1. setInterval
-// 2. clearInterval ( scope )
+    const data = response.data;
 
-// [기록 버튼을 누르면]
-// 1. recordButton에 클릭 이벤트 바인딩
+    // 코드 자체를 1초 미루는 코드
+    await delayP(1000);
 
-// [table이 등장]
-// 1. recordListWrapper에 hidden 속성 제어하기 (true | false)
+    data.forEach((user) => {
+      renderUserCard(userCardInner, user);
+    });
 
-// [table 안쪽에 tr 태그 랜더링]
-// 1. 태그 만들기
-// 2. insertLast 함수 사용하기 (tbody 안쪽에 랜더링)
+    // 카드 색상 바꿔주는 코드
+    changeColor('.user-card');
 
-// [table 안쪽에 tr 태그에 데이터를 넣고 랜더링]
-
-// [Item의 갯수가 많아짐에 따라 스크롤을 제일 하단으로 올 수 있도록]
-// 1. scrollTop
-// 2. scrollHeight
-
-// [reset버튼을 눌렀을 때 모든 항목 초기화]
-// hidden
-// 변수 초기화
-
-let count = 0;
-let total = 0;
-
-function createItem(value) {
-  const template = `
-    <tr>
-      <td>${++count}</td>
-      <td>${value}</td>
-      <td>${(total += value)}</td>
-    </tr>
-  `;
-  return template;
+    // 카드 이미지가 나오는 애니메이션 코드
+    gsap.from('.user-card', {
+      x: -100,
+      opacity: 0,
+      stagger: {
+        amount: 1,
+        from: 'start',
+      },
+    });
+  } catch {
+    renderEmptyCard(userCardInner);
+  }
 }
 
-function renderRecordItem() {
-  // const diceNumber = +attr(getNode('#cube'),'dice')
-  const diceNumber = +memo('cube').getAttribute('dice');
+renderUserList();
 
-  insertLast('tbody', createItem(diceNumber));
+// 1. user 데이터 fetch 해주세요.
+
+// 2. fetch 데이터 유저의 이름만 콘솔에 출력
+
+// 카드 삭제하는 코드
+function handleDeleteCard(e) {
+  const button = e.target.closest('button');
+
+  if (!button) return;
+
+  const article = button.parentElement;
+  const index = article.dataset.index.slice(5);
+
+  tiger.delete(`${END_POINT}/${index}`).then(() => {
+    alert('삭제가 완료됐습니다.');
+  });
 }
 
-// 주사위가 굴러가는 코드
-const handleRollingDice = (() => {
-  let isClicked = false;
-  let stopAnimation;
-
-  return () => {
-    if (!isClicked) {
-      stopAnimation = setInterval(diceAnimation, 100); // // 주사위 굴리기를 눌렀을때 다이스가 1초마다 움직이는 애니메이션 작동
-      recordButton.disabled = true;
-      resetButton.disabled = true;
-    } else {
-      clearInterval(stopAnimation);
-      recordButton.disabled = false;
-      resetButton.disabled = false;
-    }
-
-    isClicked = !isClicked;
-  };
-})();
-
-// 기록 버튼 작동
-function handleRecord() {
-  recordListWrapper.hidden = false; // 기록을 눌렀을때 레코드 리스트가 나오게 하는 것
-  renderRecordItem();
-  endScroll(recordListWrapper); // 스크롤바 맨 밑으로 내리기
-}
-
-function handleReset() {
-  recordListWrapper.hidden = true; // 초기화 누르면 기록 창 안보이기
-  clearContents('tbody'); // 기록 없애기
-  count = 0;
-  total = 0;
-}
-
-rollingButton.addEventListener('click', handleRollingDice);
-recordButton.addEventListener('click', handleRecord);
-resetButton.addEventListener('click', handleReset);
+userCardInner.addEventListener('click', handleDeleteCard);
