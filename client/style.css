@@ -116,3 +116,88 @@ h2 {
 .user-resouce-info > div:last-child {
   margin-bottom: 0;
 }
+
+/* 유저카드 생성 css */
+
+.create {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  border-radius: 1.5rem;
+  background-color: dodgerblue;
+  padding: 0.5rem;
+  z-index: 99999;
+
+  /* create 버튼 디자인 */
+  & button {
+    color: white;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+  }
+}
+
+/*  */
+.creat.open .pop {
+  visibility: initial;
+  opacity: 1;
+}
+
+/* 버튼을 제외한 구간을 팝업으로 봄 */
+.pop {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #0000006a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  backdrop-filter: blur(5px);
+  visibility: hidden;
+  opacity: 0;
+  transition: all, 5s;
+
+  /* 팝업 안의 폼 꾸미기 */
+  & form {
+    padding: 2rem;
+    background: white;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 4px 6px 11px 3px #0000007d;
+
+    & div {
+      padding: 0.5rem;
+
+      & label {
+        display: inline-block;
+        min-width: 80px;
+      }
+
+      /* 확인 및 취소 버튼 */
+      & button {
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      /* 버튼이 클릭 되었을때 css */
+      & button:hover {
+        transform: translate(1px, 1px);
+      }
+
+      & button[type='button'] {
+        background-color: hotpink;
+      }
+
+      & button[type='submit'] {
+        background-color: dodgerblue;
+      }
+    }
+  }
+}

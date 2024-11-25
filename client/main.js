@@ -71,7 +71,75 @@ function handleDeleteCard(e) {
 
   tiger.delete(`${END_POINT}/${index}`).then(() => {
     alert('삭제가 완료됐습니다.');
+
+    renderUserList();
   });
 }
 
 userCardInner.addEventListener('click', handleDeleteCard);
+
+// create 버튼 누르면 ID 입력 팝업창 나오게 하기
+// 1. create 버튼을 선택한다.
+// 2. 클릭 이벤트를 바인딩한다.
+// 3. create에 open 클래스를 추가한다.
+
+const createButton = getNode('.creat');
+const doneButton = getNode('.done');
+
+function handleCreate() {
+  // this.classList.add('open'); // 아래 gsap과 같은 코드
+  gsap.to('.pop', { autoAlpha: 1 });
+}
+
+createButton.addEventListener('click', handleCreate);
+
+// 취소 누르면 화면이 꺼지게 하기
+// 1. cancel 버튼을 선택한다.
+// 2. 클릭 이벤트를 바인딩한다.
+// 3. create에 open 클래스를 제거한다.
+
+const cancelButton = getNode('.cencel');
+
+function handleCencel(e) {
+  e.stopPropagation();
+  // createButton.classList.remove('open'); // 아래 gsap과 같은 코드
+  gsap.to('.pop', { autoAlpha: 0 });
+}
+
+cencelButton.addEventListener('click', handleCencel);
+
+// POST 통신을 해주세요.
+// 1. input의 value를 가져온다.
+// 2. value를 모아서 객체를 생성한다.
+// 3. 생성 버튼을 누르면 POST통신을 한다.
+// 4. body에 생성된 객체를 실어보낸다.
+// 5. 카드 컨텐츠 비우기
+// 6. 유저카드 리랜더링
+
+function handleDone(e) {
+  e.preventDefault();
+
+  const username = getNode(' #nameField').value;
+  const email = getNode(' #emialField').value;
+  const website = getNode(' #siteField').value;
+
+  console.log(name, email, website);
+
+  const obj = {
+    username,
+    email,
+    website,
+  };
+
+  tiger.post(END_POINT, { username, email, website }).then(() => {
+    gsap.to('pop', { autoAlpha: 0 });
+    clearContents(userCardInner);
+    renderUserList();
+
+    getNode('#nameField').value = '';
+    getNode('#emialField').value = '';
+    getNode('siteField').value = '';
+  });
+}
+
+doneButton.addEventListener('click', handleDone);
