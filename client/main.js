@@ -1,145 +1,44 @@
-import {
-  tiger,
-  delayP,
-  getNode,
-  insertLast,
-  changeColor,
-  renderSpinner,
-  renderUserCard,
-  renderEmptyCard,
-} from './lib/index.js';
+import { getNode, setStorage, getStorage, deleteStorage } from './lib/index.js';
 
-const END_POINT = 'https://jsonplaceholder.typicode.com/users';
-const userCardInner = getNode('.user-card-inner');
-renderSpinner(userCardInner);
+// 1. 인풋 이벤트 바인딩
+// - 인풋 (textarea) 태그 선택
+// - addEventListener ('input' , handler)
+// - handler 함수 안에서 값 가져오기 (this.value)
 
-async function renderUserList() {
-  try {
-    const response = await tiger.get(END_POINT);
+// 2. 인풋 값을 로컬 스토리지에 저장 (타이핑 하는 순간 순간마다)
+// - setStorage(key,value)
 
-    // getNode('.loadingSpinner').remove()
+// 3. init 함수 안에서 로컬 스토리지에 있는 값을 가져와 인풋의 value로 설정
 
-    // 로딩 창 만들어주는 코드
-    gsap.to('.loadingSpinner', {
-      opacity: 0,
-      // gsap 제공하는 코드 종료하는 법
-      onComplete() {
-        this._targets[0].remove();
-      },
-    });
+// 4. 새로고침 -> 데이터 유지
 
-    const data = response.data;
+// text 필드에 입력하여 저장하기
+const textField = getNode('#textField');
 
-    // 코드 자체를 1초 미루는 코드
-    await delayP(1000);
+function handleInput() {
+  const value = this.value;
 
-    data.forEach((user) => {
-      renderUserCard(userCardInner, user);
-    });
-
-    // 카드 색상 바꿔주는 코드
-    changeColor('.user-card');
-
-    // 카드 이미지가 나오는 애니메이션 코드
-    gsap.from('.user-card', {
-      x: -100,
-      opacity: 0,
-      stagger: {
-        amount: 1,
-        from: 'start',
-      },
-    });
-  } catch {
-    renderEmptyCard(userCardInner);
-  }
+  setStorage('text', value);
 }
 
-renderUserList();
+textField.addEventListener('input', handleInput);
 
-// 1. user 데이터 fetch 해주세요.
+// 지워줘도 데이터는 유지 시키기 (초기화 함수)
+function init() {
+  console.log('초기화');
 
-// 2. fetch 데이터 유저의 이름만 콘솔에 출력
-
-// 카드 삭제하는 코드
-function handleDeleteCard(e) {
-  const button = e.target.closest('button');
-
-  if (!button) return;
-
-  const article = button.parentElement;
-  const index = article.dataset.index.slice(5);
-
-  tiger.delete(`${END_POINT}/${index}`).then(() => {
-    alert('삭제가 완료됐습니다.');
-
-    renderUserList();
-  });
+  getStorage('text').then((res) => (textField.value = res));
 }
 
-userCardInner.addEventListener('click', handleDeleteCard);
+// 클리어를 누르면 박스 안 공간을 비워주기
+const clearButton = getNode('button[data-name="clear"]');
 
-// create 버튼 누르면 ID 입력 팝업창 나오게 하기
-// 1. create 버튼을 선택한다.
-// 2. 클릭 이벤트를 바인딩한다.
-// 3. create에 open 클래스를 추가한다.
-
-const createButton = getNode('.creat');
-const doneButton = getNode('.done');
-
-function handleCreate() {
-  // this.classList.add('open'); // 아래 gsap과 같은 코드
-  gsap.to('.pop', { autoAlpha: 1 });
+function handleClear() {
+  textField.value = '';
+  deleteStorage('text');
 }
 
-createButton.addEventListener('click', handleCreate);
+textField.addEventListener('input', handleInput);
+clearButton.addEventListener('click', handleClear);
 
-// 취소 누르면 화면이 꺼지게 하기
-// 1. cancel 버튼을 선택한다.
-// 2. 클릭 이벤트를 바인딩한다.
-// 3. create에 open 클래스를 제거한다.
-
-const cancelButton = getNode('.cencel');
-
-function handleCencel(e) {
-  e.stopPropagation();
-  // createButton.classList.remove('open'); // 아래 gsap과 같은 코드
-  gsap.to('.pop', { autoAlpha: 0 });
-}
-
-cencelButton.addEventListener('click', handleCencel);
-
-// POST 통신을 해주세요.
-// 1. input의 value를 가져온다.
-// 2. value를 모아서 객체를 생성한다.
-// 3. 생성 버튼을 누르면 POST통신을 한다.
-// 4. body에 생성된 객체를 실어보낸다.
-// 5. 카드 컨텐츠 비우기
-// 6. 유저카드 리랜더링
-
-function handleDone(e) {
-  e.preventDefault();
-
-  const username = getNode(' #nameField').value;
-  const email = getNode(' #emialField').value;
-  const website = getNode(' #siteField').value;
-
-  console.log(name, email, website);
-
-  const obj = {
-    username,
-    email,
-    website,
-  };
-
-  tiger.post(END_POINT, { username, email, website }).then(() => {
-    gsap.to('pop', { autoAlpha: 0 });
-    clearContents(userCardInner);
-    renderUserList();
-
-    getNode('#nameField').value = '';
-    getNode('#emialField').value = '';
-    getNode('siteField').value = '';
-  });
-}
-
-doneButton.addEventListener('click', handleDone);
+init();
