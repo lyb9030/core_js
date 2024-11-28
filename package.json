@@ -2,22 +2,18 @@
   "name": "core_js",
   "version": "0.0.1",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "dev": "live-server client --host=localhost --port=5500 --no-browser",
-    "serve": "json-server server/data/data.json",
-    "all": "run-p dev serve"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "keywords": [],
-  "author": "kindtiger",
+  "author": "kind-tiger",
   "license": "MIT",
-  "description": "",
-  "devDependencies": {
-    "@eslint/js": "^9.13.0",
-    "eslint": "^9.13.0",
-    "globals": "^15.11.0",
-    "json-server": "0.17.4",
-    "live-server": "1.2.2",
-    "npm-run-all": "4.1.5",
-    "prettier": "3.3.3"
+  "description": "Vite 툴체인을 사용한 개발 환경 메뉴얼 구성",
+  "dependencies": {
+    "kind-tiger": "1.0.1",
+    "vite": "6.0.1"
   }
 }
